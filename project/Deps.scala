@@ -44,5 +44,12 @@ object Deps {
 
   }
 
+  object TypesafeCofnig {
+    val org = "com.typesafe"
+    val ver = "1.3.3"
+    val config = org % "config" % ver
+    val all = Seq(config)
+  }
+
 }
 

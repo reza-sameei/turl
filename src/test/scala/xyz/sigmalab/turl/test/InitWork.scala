@@ -13,9 +13,12 @@ import org.http4s.client._
 import org.http4s.headers._
 import org.http4s.circe._
 import org.http4s.circe.CirceEntityDecoder._
+import com.typesafe.config.{Config, ConfigFactory}
 
 case class APIKey(key: String, secret: String)
+
 case class BearerAccessToken(value: String)
+
 object BearerAccessToken {
   implicit val circeDecoder = new Decoder[BearerAccessToken] {
     override def apply(c: HCursor): Result[BearerAccessToken] = {
@@ -31,10 +34,13 @@ object BearerAccessToken {
 
 object InitWork {
 
-  val apikey = APIKey(
-    "b6wRXEIi0BS77dLJmMktmskTB",
-    "cJDvf7P1vwkO34TaR39bOjgmEWnqib0SycThXVKQS9ZgsA1S53"
-  )
+  def APIKeyFromConfig() = {
+    val config = ConfigFactory.load()
+    APIKey(
+      config.getString("twitter.apikey.key"),
+      config.getString("twitter.apikey.secret")
+    )
+  }
 
   /**
     *
@@ -49,6 +55,8 @@ object InitWork {
       val entity: IO[Entity[IO]] = UrlForm.entityEncoder[IO].toEntity(form)
       entity.unsafeRunSync.body
     }
+
+    val apikey = APIKeyFromConfig()
 
     val req = Request(
       Method.POST,
@@ -152,7 +160,7 @@ class InitWork extends AsyncFlatSpec with MustMatchers {
     implicit val httpClient: Client[IO] = Http1Client[IO]().unsafeRunSync
     // httpClient: org.http4s.client.Client[cats.effect.IO] = Client(Kleisli(org.http4s.client.blaze.BlazeClient$$$Lambda$41889/699463954@4f942244),IO$1886267402)
 
-    InitWork.getToken(InitWork.apikey).map { tk =>
+    InitWork.getToken(InitWork.APIKeyFromConfig()).map { tk =>
       info(tk.toString)
       println(">>>", tk)
       assert(true, "?")

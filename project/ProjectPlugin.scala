@@ -19,6 +19,7 @@ object ProjectPlugin extends AutoPlugin {
     libraryDependencies ++= Deps.Http4sClient.all,
     libraryDependencies ++= Deps.ScalaTest.allForTest,
     libraryDependencies ++= Deps.Circe.all,
+    libraryDependencies ++= Deps.TypesafeCofnig.all,
 
     resolvers += Resolver.sonatypeRepo("snapshots")
   )
